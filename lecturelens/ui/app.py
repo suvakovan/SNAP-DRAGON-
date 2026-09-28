@@ -16,10 +16,12 @@ if str(root_dir) not in sys.path:
 
 from lecturelens.ui.components import render_sidebar
 from lecturelens.pipeline.session import run_full_pipeline, LectureSession
+from lecturelens.pipeline.qa import ask_lecture
 from lecturelens.storage.store import list_sessions, delete_session, export_markdown, load_session
+from lecturelens.storage.exports import export_anki_csv, export_srt, export_plain_transcript, export_study_sheet
 from lecturelens.pipeline.search import SearchIndex
-from lecturelens.audio.preprocess import load_audio
 from lecturelens.audio.recorder import MicRecorder
+from lecturelens.backends.base import BackendUnavailable
 from lecturelens.config import config
 
 st.set_page_config(
@@ -46,8 +48,8 @@ if "quiz_answers" not in st.session_state:
     st.session_state.quiz_answers = {}
 
 # Navigation Tabs
-tab_record, tab_notes, tab_quiz, tab_flashcards, tab_search, tab_perf, tab_history = st.tabs(
-    ["🎙️ Record / Upload", "📝 Notes & Summary", "❓ Interactive Quiz", "🎴 Flashcards", "🔍 Semantic Search", "📊 Performance", "📁 History"]
+tab_record, tab_notes, tab_quiz, tab_flashcards, tab_search, tab_ask, tab_perf, tab_history = st.tabs(
+    ["🎙️ Record / Upload", "📝 Notes & Summary", "❓ Interactive Quiz", "🎴 Flashcards", "🔍 Semantic Search", "💬 Ask Your Lecture", "📊 Performance", "📁 History"]
 )
 
 # --- TAB 1: RECORD / UPLOAD ---
@@ -116,14 +118,8 @@ with tab_record:
 
         # Demo mode instant load
         if settings["demo_mode"]:
-            st.info("🎮 Demo Mode Active: Instant Pre-recorded Lecture Demo Ready")
-            if st.button("🚀 Load Pre-recorded Demo Session", use_container_width=True):
-                demo_path = config.data_dir / "exports" / "Demo_Lecture.wav"
-                # Synthetic fallback array if file not on disk
-                synth_audio = np.random.randn(16000 * 5).astype(np.float32)
-                session = run_full_pipeline(synth_audio, title="Snapdragon Hexagon NPU Tech Talk")
-                st.session_state.current_session = session
-                st.success("Demo session loaded!")
+            st.warning("⚠️ **DEMO MODE ACTIVE** — pre-recorded sample data. Not live inference.")
+            st.info("🎮 Demo Mode: Toggle off in sidebar for real microphone capture.")
 
     with col2:
         st.markdown("### 📜 Real-time Transcript Output")
@@ -230,21 +226,60 @@ with tab_search:
         else:
             st.warning("No relevant passages matched your query.")
 
-# --- TAB 6: PERFORMANCE BENCHMARKS ---
+# --- TAB 6: ASK YOUR LECTURE ---
+with tab_ask:
+    st.subheader("💬 Ask Your Lecture — Grounded Q&A")
+    st.caption("Answers are generated only from your saved lecture transcripts. Citations link back to timestamps.")
+    curr_session = st.session_state.current_session
+    if not curr_session:
+        st.info("Process a lecture first, then ask questions about it.")
+    else:
+        ask_query = st.text_input("Ask a question about the lecture", placeholder="What did the professor say about NPUs?")
+        if ask_query:
+            try:
+                from lecturelens.backends import get_llm_backend
+                llm_backend = get_llm_backend("auto")
+                search_idx = SearchIndex()
+                with st.spinner("Searching lecture & generating grounded answer..."):
+                    qa_result = ask_lecture(ask_query, search_idx, llm_backend, top_k=4)
+
+                st.markdown("### Answer")
+                st.write(qa_result["answer"])
+
+                if qa_result["citations"]:
+                    st.markdown("#### 📎 Citations")
+                    for c in qa_result["citations"]:
+                        with st.expander(f"[{c['citation_num']}] {c['session_title']} @ {c['timestamp_sec']}s"):
+                            st.write(c["excerpt"])
+
+                st.caption(f"🔍 Retrieval: {qa_result['retrieval_time_sec']:.3f}s | 🧠 Generation: {qa_result['generation_time_sec']:.3f}s")
+
+            except BackendUnavailable as e:
+                st.warning(f"LLM backend not available: {e}\n\nStart Ollama with: `ollama serve` then `ollama pull phi3:mini`")
+
+# --- TAB 7: PERFORMANCE BENCHMARKS ---
 with tab_perf:
     st.subheader("Measured CPU vs NPU Performance Diagnostics")
-    st.markdown("Honest on-device execution measurements recorded across hardware backends.")
+    st.markdown("Real measurements from `scripts/benchmark.py`. Simulated rows are auto-excluded.")
 
-    perf_data = [
-        {"Pipeline Task": "STT Whisper-base", "Backend": "QNN (HTP NPU)", "Verified NPU": "True (When active)", "RTF / Latency": "0.0210 RTF", "Tokens/s": "N/A"},
-        {"Pipeline Task": "STT Whisper-base", "Backend": "ONNX CPU", "Verified NPU": "False", "RTF / Latency": "0.0490 RTF", "Tokens/s": "N/A"},
-        {"Pipeline Task": "LLM Phi-3 / Qwen", "Backend": "Foundry Local NPU", "Verified NPU": "True (When active)", "RTF / Latency": "0.15s TTFT", "Tokens/s": "42.5 tok/s"},
-        {"Pipeline Task": "LLM CPU Fallback", "Backend": "Local Python CPU", "Verified NPU": "False", "RTF / Latency": "0.01s TTFT", "Tokens/s": "3200 tok/s (Simulated)"},
-        {"Pipeline Task": "Embeddings MiniLM", "Backend": "ONNX CPU", "Verified NPU": "False", "RTF / Latency": "0.005s / batch", "Tokens/s": "N/A"}
-    ]
-    st.table(perf_data)
+    csv_path = Path("benchmarks/results/latest.csv")
+    if csv_path.exists():
+        try:
+            import pandas as pd
+            df = pd.read_csv(csv_path)
+            st.dataframe(df)
+        except Exception as e:
+            st.warning(f"Could not load benchmark CSV: {e}")
+    else:
+        st.info(
+            "No benchmark results yet.\n\n"
+            "Run: `python scripts/benchmark.py --quick` to generate real measurements.\n\n"
+            "Note: STT/LLM benchmarks require model files (run `python scripts/download_models.py`) "
+            "and a local LLM (run `ollama pull phi3:mini`)."
+        )
 
-# --- TAB 7: HISTORY & EXPORT ---
+
+# --- TAB 8: HISTORY & EXPORT ---
 with tab_history:
     st.subheader("Saved Lecture Sessions")
     sessions = list_sessions()
@@ -252,20 +287,29 @@ with tab_history:
         st.info("No saved sessions in database directory.")
     else:
         for s in sessions:
-            col_h1, col_h2, col_h3, col_h4 = st.columns([3, 2, 2, 2])
+            col_h1, col_h2, col_h3 = st.columns([3, 2, 2])
             col_h1.write(f"**{s.metadata.title}**\n({s.metadata.id[:8]})")
             col_h2.write(f"📅 {s.metadata.created_at[:10]}")
             col_h3.write(f"⏱️ {s.metadata.audio_duration_seconds:.1f}s")
 
-            with col_h4:
+            btn_cols = st.columns(5)
+            with btn_cols[0]:
                 if st.button("📖 Open", key=f"open_{s.metadata.id}"):
                     st.session_state.current_session = s
                     st.rerun()
-
-                if st.button("📥 Markdown", key=f"md_{s.metadata.id}"):
-                    out_path = export_markdown(s)
-                    st.success(f"Exported to {out_path.name}")
-
+            with btn_cols[1]:
+                if st.button("📄 Study Sheet", key=f"study_{s.metadata.id}"):
+                    p = export_study_sheet(s)
+                    st.success(f"Saved: {p.name}")
+            with btn_cols[2]:
+                if st.button("🃏 Anki CSV", key=f"anki_{s.metadata.id}"):
+                    p = export_anki_csv(s)
+                    st.success(f"Saved: {p.name}")
+            with btn_cols[3]:
+                if st.button("📜 SRT", key=f"srt_{s.metadata.id}"):
+                    p = export_srt(s)
+                    st.success(f"Saved: {p.name}")
+            with btn_cols[4]:
                 if st.button("🗑️ Delete", key=f"del_{s.metadata.id}"):
                     delete_session(s.metadata.id)
                     st.rerun()

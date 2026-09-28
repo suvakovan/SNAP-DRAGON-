@@ -31,7 +31,7 @@ class NPUSampler:
             self.ram_samples_mb.append(ram_mb)
             time.sleep(self.interval_sec)
 
-    def stop() -> Dict[str, Any]:
+    def stop(self) -> Dict[str, Any]:
         self._stop_event.set()
         if self._thread:
             self._thread.join(timeout=2.0)

@@ -50,6 +50,12 @@ class CPULLMBackend(LLMBackend):
             r = requests.get(f"{_OLLAMA_BASE}/api/tags", timeout=3)
             if r.status_code == 200:
                 models = [m["name"] for m in r.json().get("models", [])]
+                if not models:
+                    raise BackendUnavailable(
+                        "Ollama is running but no models are loaded.\n"
+                        "Pull a model first: ollama pull phi3:mini\n"
+                        "Or:                 ollama pull qwen2:1.5b"
+                    )
                 self._engine = "ollama"
                 self._base_url = _OLLAMA_BASE
                 self.info.details["engine"] = "ollama"
@@ -58,12 +64,14 @@ class CPULLMBackend(LLMBackend):
                 self.info.is_real = True
                 self.info.is_simulated = False
                 # Pick first available model if configured one not listed
-                if self.model_name not in models and models:
+                if self.model_name not in models:
                     self.model_name = models[0]
                     self.info.name = self.model_name
                     logger.info(f"Model override: using available Ollama model '{self.model_name}'")
                 logger.info(f"CPU LLM Backend: Ollama connected. Model: {self.model_name}")
                 return
+        except BackendUnavailable:
+            raise
         except Exception as e:
             logger.debug(f"Ollama not reachable: {e}")
 
