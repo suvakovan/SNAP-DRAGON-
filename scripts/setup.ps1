@@ -1,33 +1,51 @@
-# PowerShell Setup Script for LectureLens
+# LectureLens Setup Script for Windows
+# Creates virtual environment, installs dependencies, and runs environment proof
+
 $ErrorActionPreference = "Stop"
 
-Write-Host "=== LectureLens Setup ===" -ForegroundColor Cyan
+Write-Host "=========================================" -ForegroundColor Cyan
+Write-Host "     LectureLens Environment Setup       " -ForegroundColor Cyan
+Write-Host "=========================================" -ForegroundColor Cyan
 
-# Check Python environment
-$PythonVersion = python -c "import platform; print(platform.python_version())"
-$PythonArch = python -c "import platform; print(platform.machine())"
-
-Write-Host "Detected Python Version: $PythonVersion ($PythonArch)" -ForegroundColor Green
-
-# Create Virtual Environment if not exists
-if (-not (Test-Path -Path ".venv")) {
-    Write-Host "Creating venv under .venv..." -ForegroundColor Yellow
-    python -m venv .venv
+# 1. Check Python installation
+try {
+    $pythonVer = python --version 2>&1
+    Write-Host "Detected Python: $pythonVer" -ForegroundColor Green
+} catch {
+    Write-Host "Error: Python is not installed or not in PATH." -ForegroundColor Red
+    Exit 1
 }
 
-# Activate Venv
-$VenvActivate = ".\.venv\Scripts\Activate.ps1"
-if (Test-Path -Path $VenvActivate) {
-    & $VenvActivate
+# Check Python architecture
+$archCheck = python -c "import sysconfig; print(sysconfig.get_platform())"
+Write-Host "Python Target Platform: $archCheck" -ForegroundColor Yellow
+
+if ($archCheck -notlike "*arm64*" -and $archCheck -notlike "*aarch64*") {
+    Write-Host "[NOTE] Non-ARM64 Python detected ($archCheck). App will run in CPU fallback mode." -ForegroundColor Yellow
 }
 
-# Upgrade pip & install requirements
-Write-Host "Installing dependencies..." -ForegroundColor Yellow
+# 2. Create Virtual Environment
+$venvPath = "venv"
+if (-not (Test-Path $venvPath)) {
+    Write-Host "Creating virtual environment in .\$venvPath..." -ForegroundColor Cyan
+    python -m venv $venvPath
+} else {
+    Write-Host "Virtual environment .\$venvPath already exists." -ForegroundColor Green
+}
+
+# 3. Activate Virtual Environment and Upgrade Pip
+$activateScript = ".\$venvPath\Scripts\Activate.ps1"
+if (Test-Path $activateScript) {
+    Write-Host "Activating virtual environment..." -ForegroundColor Cyan
+    & $activateScript
+}
+
+Write-Host "Installing project requirements..." -ForegroundColor Cyan
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 
-# Run Environment Check
-Write-Host "Running environment check..." -ForegroundColor Yellow
-python scripts/check_env.py
+# 4. Run Environment Proof
+Write-Host "Running environment proof verification..." -ForegroundColor Cyan
+python scripts/env_proof.py
 
-Write-Host "`nSetup completed successfully! Run 'scripts/run.ps1' to start the application." -ForegroundColor Green
+Write-Host "`nSetup complete! Run app with: scripts/run.ps1" -ForegroundColor Green

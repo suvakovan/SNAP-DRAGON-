@@ -1,0 +1,41 @@
+{
+  "timestamp": "CEASERFLAWS",
+  "is_snapdragon_arm64_native": false,
+  "platform": {
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 190 Stepping 0, GenuineIntel",
+    "platform_string": "Windows-11-10.0.26200-SP0",
+    "os_product_name": "Windows 10 Home",
+    "os_display_version": "25H2",
+    "cpu_name": "Intel(R) Core(TM) i3-N305"
+  },
+  "python": {
+    "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "bitness": 64,
+    "target_platform": "win-amd64",
+    "is_arm64_build": false
+  },
+  "hardware_resources": {
+    "ram_total_gb": 7.75,
+    "ram_available_gb": 0.73,
+    "battery": {
+      "percent": 61,
+      "power_plugged": false,
+      "secsleft": 6601
+    },
+    "power_plan": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)"
+  },
+  "runtimes": {
+    "onnxruntime_version": "1.30.0",
+    "onnxruntime_providers": [
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "qai_hub_models_version": "Not Installed",
+    "foundry_version": "Execution error: [WinError 2] The system cannot find the file specified",
+    "foundry_status": "Execution error: [WinError 2] The system cannot find the file specified",
+    "ollama_version": "ollama version is 0.34.4",
+    "llama_server_version": "Execution error: [WinError 2] The system cannot find the file specified"
+  },
+  "npu_performance_counters": "\\RemoteFX Graphics(*)\\Input Frames/Second\n\\Memory\\Pages Input/sec"
+}
