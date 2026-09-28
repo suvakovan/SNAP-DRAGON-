@@ -20,6 +20,9 @@ data/
 *.onnx_data
 *.engine
 
+# Quarantined fake benchmark results
+benchmarks/quarantine/
+
 # Streamlit
 .streamlit/
 

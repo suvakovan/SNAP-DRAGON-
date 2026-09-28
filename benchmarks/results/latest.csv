@@ -1,5 +1,0 @@
-task,backend,device,verified_npu,mean_wall_sec,mean_rtf,std_rtf,mean_cpu_percent,mean_latency_sec,mean_tps,std_tps
-STT,onnxruntime-cpu,CPU,False,0.05072426795959473,0.0016908089319864908,0.0,33.3,,,
-STT,onnxruntime-cpu,CPU,False,0.05097651481628418,0.001699217160542806,0.0,29.2,,,
-LLM,cpu-fallback,CPU,False,,,,0.0,0.0,3200.0,0.0
-LLM,cpu-fallback,CPU,False,,,,0.0,0.0,3200.0,0.0

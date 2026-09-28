@@ -8,6 +8,8 @@ from typing import List, Dict, Any, Tuple, Optional
 import numpy as np
 
 from lecturelens.backends import get_embed_backend
+from lecturelens.backends.base import BackendUnavailable
+from lecturelens.backends.embed_onnx import DeterministicEmbedBackend
 from lecturelens.pipeline.session import LectureSession
 from lecturelens.storage.store import list_sessions
 from lecturelens.config import config
@@ -46,7 +48,11 @@ class SearchIndex:
         self.index_dir.mkdir(parents=True, exist_ok=True)
         self.passages: List[Dict[str, Any]] = []
         self.embeddings: Optional[np.ndarray] = None
-        self.embed_backend = get_embed_backend()
+        try:
+            self.embed_backend = get_embed_backend()
+        except BackendUnavailable as e:
+            logger.warning(f"SearchIndex: Real embedding backend unavailable ({e}). Using deterministic fallback for search.")
+            self.embed_backend = DeterministicEmbedBackend()
 
     def build_index(self, sessions: Optional[List[LectureSession]] = None) -> None:
         """Indexes all sessions into vectors and passage metadata."""

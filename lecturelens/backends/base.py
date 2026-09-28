@@ -14,6 +14,8 @@ class BackendInfo:
     runtime: str            # "onnxruntime" | "foundry-local" | "llama.cpp" | "cpu-fallback"
     device: str             # "NPU" | "CPU" | "GPU"
     verified_npu: bool      # True ONLY if NPU/QNN execution provider was confirmed active
+    is_real: bool = False   # True only if a real model file / real inference engine is loaded
+    is_simulated: bool = True  # True if backend returns canned/template/mock output
     details: Dict[str, Any] = field(default_factory=dict)  # providers, paths, versions
 
 
@@ -27,20 +29,25 @@ class STTResult:
     rtf: float                            # wall_seconds / audio_seconds (real-time factor)
 
 
+class BackendUnavailable(RuntimeError):
+    """Raised when a backend is not installed or not reachable."""
+    pass
+
+
 class STTBackend(ABC):
     info: BackendInfo
 
     @abstractmethod
     def load(self) -> None:
         """Load model assets into memory/hardware."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def transcribe(
         self, audio: np.ndarray, sample_rate: int = 16000, language: Optional[str] = None
     ) -> STTResult:
         """Transcribe single audio buffer into text and segments."""
-        pass
+        raise NotImplementedError
 
 
 @dataclass
@@ -59,7 +66,7 @@ class LLMBackend(ABC):
     @abstractmethod
     def load(self) -> None:
         """Load LLM connection or model into memory."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def generate(
@@ -71,7 +78,7 @@ class LLMBackend(ABC):
         json_mode: bool = False,
     ) -> LLMResult:
         """Generate response given system and user prompts."""
-        pass
+        raise NotImplementedError
 
 
 class EmbedBackend(ABC):
@@ -80,9 +87,9 @@ class EmbedBackend(ABC):
     @abstractmethod
     def load(self) -> None:
         """Load embedding model assets."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def embed(self, texts: List[str]) -> np.ndarray:
         """Generate normalized embedding vectors for texts."""
-        pass
+        raise NotImplementedError

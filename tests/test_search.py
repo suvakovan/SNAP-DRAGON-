@@ -4,6 +4,7 @@ Tests for semantic and hybrid search pipeline.
 
 from lecturelens.pipeline.session import LectureSession, SessionMetadata
 from lecturelens.pipeline.search import SearchIndex, chunk_transcript_into_passages
+from lecturelens.backends.embed_onnx import DeterministicEmbedBackend
 
 
 def create_mock_session(session_id: str, title: str, transcript: str) -> LectureSession:
@@ -41,6 +42,7 @@ def test_search_index_top_k():
     s2 = create_mock_session("s2", "Organic Chemistry", "Photosynthesis converts sunlight into chemical energy in plants.")
 
     index = SearchIndex()
+    index.embed_backend = DeterministicEmbedBackend()
     index.build_index([s1, s2])
 
     results = index.search("Snapdragon NPU hardware", top_k=2)
