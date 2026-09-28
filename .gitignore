@@ -22,6 +22,8 @@ data/
 
 # Quarantined fake benchmark results
 benchmarks/quarantine/
+benchmarks/results/*.json
+benchmarks/results/*.csv
 
 # Streamlit
 .streamlit/
