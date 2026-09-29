@@ -30,6 +30,50 @@ st.set_page_config(
     layout="wide"
 )
 
+# Glassmorphism & Visual Styling
+st.markdown("""
+<style>
+    /* Dark Glassmorphism Styling */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    }
+    [data-testid="stSidebar"] {
+        background: rgba(15, 23, 42, 0.75) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .stMetric {
+        background: rgba(30, 41, 59, 0.6) !important;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        padding: 12px 16px !important;
+    }
+    div[data-testid="stExpander"] {
+        background: rgba(30, 41, 59, 0.4) !important;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px !important;
+    }
+    div[data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    button[data-baseweb="tab"] {
+        border-radius: 8px !important;
+        padding: 8px 16px !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        transition: all 0.2s ease !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: rgba(99, 102, 241, 0.25) !important;
+        border-color: rgba(129, 140, 248, 0.6) !important;
+        color: #a5b4fc !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Page Header
 st.title("🎓 LectureLens")
 st.caption("Fully Offline Lecture Copilot Accelerated for Snapdragon X Series Laptops")
