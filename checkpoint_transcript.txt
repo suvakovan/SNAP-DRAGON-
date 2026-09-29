@@ -1,0 +1,1 @@
+Welcome to the lecture lens machine learning and natural light which processing lecture. Today we will explore automatic speech recognition using neural networks and quantized NPU execution providers on snapdragon platform. We will analyze audio signals and generate detailed study notes.

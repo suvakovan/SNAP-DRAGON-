@@ -54,18 +54,25 @@ class CPUWhisperBackend(STTBackend):
 
         # Check model files exist
         if not _ENCODER_PATH.exists() or not _DECODER_PATH.exists():
-            msg = (
-                f"Whisper ONNX model files not found.\n"
-                f"  Expected encoder: {_ENCODER_PATH}\n"
-                f"  Expected decoder: {_DECODER_PATH}\n"
-                f"Run: python scripts/download_models.py  to fetch them."
-            )
-            logger.warning(msg)
-            # Mark as not real — will use fallback path
-            self.info.is_real = False
-            self.info.is_simulated = True
-            self.info.details["npu_unverified_reason"] = "Model files not present"
-            return
+            try:
+                import whisper
+                self._whisper_model = whisper.load_model("tiny")
+                self.info.is_real = True
+                self.info.is_simulated = False
+                self.info.runtime = "whisper-pytorch-cpu"
+                self._loaded = True
+                logger.info("CPU Whisper Backend loaded PyTorch Whisper ('tiny') fallback.")
+                return
+            except Exception as e:
+                msg = (
+                    f"Whisper model files not found ({_ENCODER_PATH}) and PyTorch whisper fallback failed: {e}\n"
+                    f"Run: python scripts/download_models.py  to fetch them."
+                )
+                logger.warning(msg)
+                self.info.is_real = False
+                self.info.is_simulated = True
+                self.info.details["npu_unverified_reason"] = "Model files not present"
+                return
 
         try:
             opts = ort.SessionOptions()
@@ -109,7 +116,34 @@ class CPUWhisperBackend(STTBackend):
                 audio_seconds=0.0, wall_seconds=0.0, rtf=0.0
             )
 
-        # --- Real Whisper decode loop ---
+        if hasattr(self, "_whisper_model") and self._whisper_model is not None:
+            start_t = time.time()
+            audio_seconds = len(audio) / float(sample_rate) if len(audio) > 0 else 0.0
+            if audio_seconds == 0:
+                return STTResult(
+                    text="", segments=[], language=language or "en",
+                    audio_seconds=0.0, wall_seconds=0.0, rtf=0.0
+                )
+            res = self._whisper_model.transcribe(audio.astype(np.float32), fp16=False, language=language)
+            wall_seconds = time.time() - start_t
+            rtf = wall_seconds / max(audio_seconds, 0.001)
+            segments = []
+            for seg in res.get("segments", []):
+                segments.append({
+                    "start": round(seg.get("start", 0.0), 2),
+                    "end": round(seg.get("end", 0.0), 2),
+                    "text": seg.get("text", "").strip()
+                })
+            return STTResult(
+                text=res.get("text", "").strip(),
+                segments=segments,
+                language=language or "en",
+                audio_seconds=audio_seconds,
+                wall_seconds=wall_seconds,
+                rtf=rtf
+            )
+
+        # --- Real Whisper ONNX decode loop ---
         # 1. Compute log-mel spectrogram (80-band, 30s context)
         mel = _compute_log_mel(audio, sample_rate)
 

@@ -117,10 +117,10 @@ class CPULLMBackend(LLMBackend):
 
         if self._engine == "ollama":
             full_text, first_token_time, prompt_tokens, completion_tokens = \
-                self._generate_ollama(system, user, max_tokens, temperature)
+                self._generate_ollama(system, user, max_tokens, temperature, json_mode)
         else:
             full_text, first_token_time, prompt_tokens, completion_tokens = \
-                self._generate_llama_cpp(system, user, max_tokens, temperature)
+                self._generate_llama_cpp(system, user, max_tokens, temperature, json_mode)
 
         total_seconds = time.time() - start_t
 
@@ -151,7 +151,7 @@ class CPULLMBackend(LLMBackend):
         )
 
     def _generate_ollama(
-        self, system: str, user: str, max_tokens: int, temperature: float
+        self, system: str, user: str, max_tokens: int, temperature: float, json_mode: bool = False
     ):
         """Stream from Ollama API and return (text, ttft, prompt_tokens, completion_tokens)."""
         prompt_tokens = None
@@ -168,6 +168,8 @@ class CPULLMBackend(LLMBackend):
                 "num_predict": max_tokens
             }
         }
+        if json_mode:
+            payload["format"] = "json"
 
         start = time.time()
         with requests.post(
@@ -193,7 +195,7 @@ class CPULLMBackend(LLMBackend):
         return "".join(chunks), first_token_time, prompt_tokens, completion_tokens
 
     def _generate_llama_cpp(
-        self, system: str, user: str, max_tokens: int, temperature: float
+        self, system: str, user: str, max_tokens: int, temperature: float, json_mode: bool = False
     ):
         """Stream from llama.cpp OpenAI-compatible API."""
         first_token_time = None
@@ -211,6 +213,8 @@ class CPULLMBackend(LLMBackend):
             "temperature": temperature,
             "stream": True
         }
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
 
         start = time.time()
         with requests.post(

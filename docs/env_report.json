@@ -29,37 +29,37 @@
       "channels": 2
     },
     {
-      "index": 4,
+      "index": 5,
       "name": "Primary Sound Capture Driver",
       "channels": 2
     },
     {
-      "index": 5,
-      "name": "Microphone (Realtek(R) Audio)",
-      "channels": 2
-    },
-    {
-      "index": 9,
+      "index": 6,
       "name": "Microphone (Realtek(R) Audio)",
       "channels": 2
     },
     {
       "index": 12,
+      "name": "Microphone (Realtek(R) Audio)",
+      "channels": 2
+    },
+    {
+      "index": 15,
       "name": "PC Speaker (Realtek HD Audio 2nd output with SST)",
       "channels": 2
     },
     {
-      "index": 13,
+      "index": 16,
       "name": "Stereo Mix (Realtek HD Audio Stereo input)",
       "channels": 2
     },
     {
-      "index": 14,
+      "index": 17,
       "name": "Microphone (Realtek HD Audio Mic input)",
       "channels": 2
     },
     {
-      "index": 17,
+      "index": 20,
       "name": "PC Speaker (Realtek HD Audio output with SST)",
       "channels": 2
     }
