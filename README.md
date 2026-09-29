@@ -70,14 +70,14 @@ graph TD
 
 > **Development machine:** Intel AMD64 (no Snapdragon NPU). All `verified_npu=True` rows below are **design-intent** — implemented in code but not hardware-verified on this machine. See `docs/HEADLINE_RESULTS.md` for full transparency notes.
 
-| Task | Runtime / Backend | Device | Verified NPU | Processing Metric |
+| Task | Runtime / Backend | Device | Execution & Hardware Status | Processing Metric |
 | :--- | :--- | :--- | :--- | :--- |
-| **STT (Whisper-tiny)** | PyTorch Whisper CPU | CPU | ❌ False | RTF ~0.166 (measured, dev machine) |
-| **STT (Whisper-base)** | ONNX Runtime + QNN | NPU | ⚡ True (target) | RTF ~0.021 (design-intent, Snapdragon X) |
-| **LLM (phi3:mini via Ollama)** | cpu-local-llm | CPU | ❌ False | 4.93 tok/sec, TTFT=15.25s (measured) |
-| **LLM (Foundry Local NPU)** | Foundry Local | NPU | ⚡ True (target) | ~42.5 tok/sec (design-intent, Snapdragon X) |
-| **Embeddings (MiniLM-L6-v2)** | ONNX Runtime CPU | CPU | ❌ False | < 5 ms / passage (measured) |
-| **STT WER** | Whisper-tiny, TTS clean speech | CPU | ❌ False | **10% WER** (40-word reference, measured) |
+| **STT (Whisper-tiny)** | PyTorch Whisper CPU | CPU | 💻 Active (CPU Fallback) | RTF ~0.166 (measured, dev machine) |
+| **STT (Whisper-base)** | ONNX Runtime + QNN | NPU | ⚙ Code-Ready (Snapdragon X) | RTF ~0.021 (design-intent, Snapdragon X) |
+| **LLM (phi3:mini via Ollama)** | cpu-local-llm | CPU | 💻 Active (CPU Fallback) | 4.93 tok/sec, TTFT=15.25s (measured) |
+| **LLM (Foundry Local NPU)** | Foundry Local | NPU | ⚙ Code-Ready (Snapdragon X) | ~42.5 tok/sec (design-intent, Snapdragon X) |
+| **Embeddings (MiniLM-L6-v2)** | ONNX Runtime CPU | CPU | 💻 Active (CPU Fallback) | < 5 ms / passage (measured) |
+| **STT WER** | Whisper-tiny, TTS clean speech | CPU | 💻 Active (CPU Fallback) | **10% WER** (40-word reference, measured) |
 
 ---
 
