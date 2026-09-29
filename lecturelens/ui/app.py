@@ -30,46 +30,187 @@ st.set_page_config(
     layout="wide"
 )
 
-# Glassmorphism & Visual Styling
+# iQOO Monster Cyber Yellow & Obsidian Black Premium Visual Styling
 st.markdown("""
 <style>
-    /* Dark Glassmorphism Styling */
+    @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* iQOO Pure Carbon / Pitch Black Background */
     .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+        background-color: #000000 !important;
+        background-image: radial-gradient(circle at 50% 0%, #1C1900 0%, #000000 80%) !important;
+        color: #FFFFFF !important;
     }
+
+    /* Sidebar - iQOO Matte Black with Neon Yellow Trim */
     [data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.75) !important;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: #0A0A0C !important;
+        border-right: 2px solid #FFD100 !important;
     }
-    .stMetric {
-        background: rgba(30, 41, 59, 0.6) !important;
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 12px !important;
-        padding: 12px 16px !important;
+
+    [data-testid="stSidebar"] * {
+        color: #E4E4E7 !important;
     }
-    div[data-testid="stExpander"] {
-        background: rgba(30, 41, 59, 0.4) !important;
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 10px !important;
+
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] strong {
+        color: #FFD100 !important;
     }
+
+    /* iQOO Cyber Yellow Headlines */
+    h1, h2, h3, .stSubheader, [data-testid="stHeader"] {
+        color: #FFD100 !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.02em !important;
+    }
+    
+    /* iQOO Main Title */
+    .stApp h1 {
+        font-family: 'Teko', 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 3.2rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        color: #FFD100 !important;
+        text-shadow: 0 0 20px rgba(255, 209, 0, 0.4) !important;
+    }
+
+    /* iQOO Monster Yellow Tab Navigation Bar */
     div[data-baseweb="tab-list"] {
-        gap: 8px;
+        background: #111113 !important;
+        padding: 8px !important;
+        border-radius: 14px !important;
+        border: 1px solid #FFD100 !important;
+        box-shadow: 0 0 15px rgba(255, 209, 0, 0.2) !important;
+        gap: 6px !important;
     }
+
     button[data-baseweb="tab"] {
-        border-radius: 8px !important;
-        padding: 8px 16px !important;
-        background: rgba(255, 255, 255, 0.04) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        padding: 10px 20px !important;
+        background: #18181C !important;
+        border: 1px solid #27272A !important;
+        color: #D4D4D8 !important;
+        font-weight: 700 !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    button[data-baseweb="tab"]:hover {
+        color: #FFD100 !important;
+        border-color: #FFD100 !important;
+        background: #222200 !important;
+    }
+
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: #FFD100 !important;
+        color: #000000 !important;
+        font-weight: 900 !important;
+        border-color: #FFD100 !important;
+        box-shadow: 0 0 20px rgba(255, 209, 0, 0.6) !important;
+    }
+
+    /* iQOO Metric Cards with Electric Yellow Accents */
+    .stMetric {
+        background: #0F0F12 !important;
+        border: 1px solid #FFD100 !important;
+        border-radius: 14px !important;
+        padding: 16px 20px !important;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 209, 0, 0.05) !important;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #FFD100 !important;
+        font-weight: 900 !important;
+        font-size: 2.2rem !important;
+        text-shadow: 0 0 10px rgba(255, 209, 0, 0.3) !important;
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #A1A1AA !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08em !important;
+    }
+
+    /* Buttons: Full Solid iQOO Yellow with Black Text */
+    .stButton > button, div.stDownloadButton > button {
+        background: #FFD100 !important;
+        color: #000000 !important;
+        font-weight: 900 !important;
+        font-size: 1rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        border-radius: 12px !important;
+        border: none !important;
+        padding: 12px 28px !important;
+        box-shadow: 0 4px 15px rgba(255, 209, 0, 0.4) !important;
         transition: all 0.2s ease !important;
     }
-    button[data-baseweb="tab"][aria-selected="true"] {
-        background: rgba(99, 102, 241, 0.25) !important;
-        border-color: rgba(129, 140, 248, 0.6) !important;
-        color: #a5b4fc !important;
+
+    .stButton > button:hover, div.stDownloadButton > button:hover {
+        background: #FFE566 !important;
+        color: #000000 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(255, 209, 0, 0.7) !important;
+    }
+    
+    .stButton > button p, .stButton > button span {
+        color: #000000 !important;
+        font-weight: 900 !important;
+    }
+
+    /* Expanders & Cards */
+    div[data-testid="stExpander"] {
+        background: #0F0F12 !important;
+        border: 1px solid #333300 !important;
+        border-left: 4px solid #FFD100 !important;
+        border-radius: 12px !important;
+    }
+
+    div[data-testid="stExpander"]:hover {
+        border-color: #FFD100 !important;
+    }
+
+    /* Radio Options & Inputs */
+    div[role="radiogroup"] label {
+        background: #141418 !important;
+        border: 1px solid #27272A !important;
+        border-radius: 10px !important;
+        padding: 12px 18px !important;
+        margin-bottom: 8px !important;
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    div[role="radiogroup"] label:hover {
+        border-color: #FFD100 !important;
+        background: #1C1C00 !important;
+        color: #FFD100 !important;
+    }
+
+    /* Text Inputs / Textarea */
+    .stTextInput > div > div > input, .stTextArea textarea {
+        background: #141418 !important;
+        border: 1px solid #333333 !important;
+        color: #FFFFFF !important;
+        border-radius: 10px !important;
+    }
+
+    .stTextInput > div > div > input:focus, .stTextArea textarea:focus {
+        border-color: #FFD100 !important;
+        box-shadow: 0 0 10px rgba(255, 209, 0, 0.3) !important;
+    }
+
+    /* Badges & Alerts */
+    .stAlert {
+        background: #181600 !important;
+        border: 1px solid #FFD100 !important;
+        color: #FFD100 !important;
+        border-radius: 12px !important;
+        font-weight: 700 !important;
     }
 </style>
 """, unsafe_allow_html=True)

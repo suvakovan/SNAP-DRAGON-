@@ -2,7 +2,7 @@
 
 > **One-Sentence Pitch:** A fully offline, privacy-first lecture copilot engineered for Snapdragon X Windows-on-ARM laptops that transforms microphone streams or recorded lectures into transcripts, executive summaries, interactive quizzes, flashcards, and semantic search on-device.
 
-![LectureLens Banner Placeholder](https://via.placeholder.com/800x400.png?text=LectureLens+Snapdragon+PC+Offline+Copilot)
+![LectureLens Cyber Yellow & Obsidian Black UI Preview](docs/assets/app_preview.png)
 
 ---
 
