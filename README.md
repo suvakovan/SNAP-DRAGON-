@@ -68,13 +68,16 @@ graph TD
 
 ## 📊 Measured CPU vs NPU Benchmarks
 
+> **Development machine:** Intel AMD64 (no Snapdragon NPU). All `verified_npu=True` rows below are **design-intent** — implemented in code but not hardware-verified on this machine. See `docs/HEADLINE_RESULTS.md` for full transparency notes.
+
 | Task | Runtime / Backend | Device | Verified NPU | Processing Metric |
 | :--- | :--- | :--- | :--- | :--- |
-| **STT (Whisper-base)** | Qualcomm QNN / HTP | NPU | True | ~0.0210 Real-Time Factor (RTF) |
-| **STT (Whisper-base)** | ONNX Runtime CPU | CPU | False | ~0.0490 Real-Time Factor (RTF) |
-| **LLM Summarization** | Foundry Local NPU | NPU | True | ~42.5 Tokens / Sec |
-| **LLM Summarization** | Local CPU Fallback | CPU | False | ~3200.0 Tokens / Sec (Simulated) |
-| **Embeddings (MiniLM)**| ONNX Runtime CPU | CPU | False | < 5 ms / passage |
+| **STT (Whisper-tiny)** | PyTorch Whisper CPU | CPU | ❌ False | RTF ~0.166 (measured, dev machine) |
+| **STT (Whisper-base)** | ONNX Runtime + QNN | NPU | ⚡ True (target) | RTF ~0.021 (design-intent, Snapdragon X) |
+| **LLM (phi3:mini via Ollama)** | cpu-local-llm | CPU | ❌ False | 4.93 tok/sec, TTFT=15.25s (measured) |
+| **LLM (Foundry Local NPU)** | Foundry Local | NPU | ⚡ True (target) | ~42.5 tok/sec (design-intent, Snapdragon X) |
+| **Embeddings (MiniLM-L6-v2)** | ONNX Runtime CPU | CPU | ❌ False | < 5 ms / passage (measured) |
+| **STT WER** | Whisper-tiny, TTS clean speech | CPU | ❌ False | **10% WER** (40-word reference, measured) |
 
 ---
 

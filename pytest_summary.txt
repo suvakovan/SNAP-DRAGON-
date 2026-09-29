@@ -1,0 +1,82 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.3.3, pluggy-1.6.0
+rootdir: C:\Users\Solitude\Documents\SNAP DRAGON
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, asyncio-0.24.0, cov-5.0.0
+asyncio: mode=Mode.STRICT, default_loop_scope=None
+collected 24 items
+
+tests\test_audio.py ..                                                   [  8%]
+tests\test_backend_detect.py .                                           [ 12%]
+tests\test_chunker.py .                                                  [ 16%]
+tests\test_no_simulation_in_prod.py .....                                [ 37%]
+tests\test_notes_schema.py ....                                          [ 54%]
+tests\test_qa.py ...                                                     [ 66%]
+tests\test_search.py ..                                                  [ 75%]
+tests\test_wer.py ......                                                 [100%]
+
+============================== warnings summary ===============================
+tests\test_no_simulation_in_prod.py:16
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_no_simulation_in_prod.py:16: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_no_simulation_in_prod.py:32
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_no_simulation_in_prod.py:32: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_no_simulation_in_prod.py:46
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_no_simulation_in_prod.py:46: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_no_simulation_in_prod.py:60
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_no_simulation_in_prod.py:60: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_no_simulation_in_prod.py:69
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_no_simulation_in_prod.py:69: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_qa.py:9
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_qa.py:9: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_qa.py:17
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_qa.py:17: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_qa.py:26
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_qa.py:26: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_wer.py:9
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_wer.py:9: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_wer.py:15
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_wer.py:15: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_wer.py:22
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_wer.py:22: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_wer.py:29
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_wer.py:29: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_wer.py:36
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_wer.py:36: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_wer.py:42
+  C:\Users\Solitude\Documents\SNAP DRAGON\tests\test_wer.py:42: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 24 passed, 14 warnings in 369.64s (0:06:09) =================
+
+C:\Users\Solitude\AppData\Local\Programs\Python\Python312\Lib\site-packages\pytest_asyncio\plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

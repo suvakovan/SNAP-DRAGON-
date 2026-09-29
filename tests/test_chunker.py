@@ -4,7 +4,13 @@ Tests for audio window chunker.
 
 import numpy as np
 from lecturelens.audio.chunker import chunk_audio
-from tests.test_audio import create_synthetic_audio
+try:
+    from tests.test_audio import create_synthetic_audio
+except ImportError:
+    try:
+        from test_audio import create_synthetic_audio
+    except ImportError:
+        from .test_audio import create_synthetic_audio
 
 
 def test_chunker_coverage_and_overlap():
