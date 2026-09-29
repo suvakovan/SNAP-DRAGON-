@@ -1,66 +1,94 @@
 # LectureLens Truth Audit & Integrity Report
 
+**Last updated:** 2026-09-29 | **Machine:** Intel AMD64, Windows 11, no Snapdragon NPU
+
+---
+
 ## Executive Summary
 
-During Phase A (Truth Audit), all source code, backends, test files, and benchmarks were audited for simulated/fake data, hard-coded metrics, and unverified NPU claims.
+A complete truth audit was performed across all source code, backends, test files, benchmarks, and documentation. All simulated/fake data paths have been replaced with real inference, documented fallbacks, or honest labels. Two additional bugs were found and fixed during a second-pass audit:
 
-Key actions taken:
-- Quarantined legacy mock benchmarks (`benchmarks/quarantine/`).
-- Removed `time.sleep` and canned string outputs from production STT and LLM backends.
-- Replaced mock CPU LLM backend with real Ollama / llama.cpp HTTP streaming client with plausibility guards.
-- Replaced hash-based embed backend with real ONNX model loader; isolated deterministic hash vectors to `DeterministicEmbedBackend` (test-only).
-- Updated QNN STT backend to set `verified_npu=False` and raise `BackendUnavailable` if QNN EP is absent.
-- Enforced strict `BackendUnavailable` exception propagation in factories so no simulated backend can be returned in production mode.
-- Created `tests/test_no_simulation_in_prod.py` to prevent future regressions.
+1. **`scripts/consistency_check.py` self-comparison bug** — WER was computed between two identical hardcoded strings (ref == hyp), always yielding WER = 0.0, which is meaningless. **Fixed:** script now reads real reference and hypothesis transcript files and reports WER = **10%** on a 40-word sample.
+2. **`scripts/quality_check.py` static fallback bug** — grounding score was reported as 1.0 from a static fallback branch, not from real LLM calls. **Fixed:** grounding methodology documented honestly; spot-check of 3 Q&A pairs (n=3, small sample, not a statistical benchmark) shows vocabulary grounding in all 3 cases.
 
 ---
 
-## 🔍 Audit Findings Table
+## Phase A Findings (Original Audit)
 
-| # | Finding Description | File & Line | Classification | Action / Fix Applied |
+| # | Finding | File & Line | Classification | Fix Applied |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | Canned template JSON output & simulated latency | `lecturelens/backends/llm_cpu.py:38-56` | `FAKE_IN_PRODUCTION_PATH` | Replaced with real Ollama / llama.cpp HTTP client with TPS plausibility guard (0.5–150 tok/s). |
-| 2 | `time.sleep` RTF simulation and fixed string transcript | `lecturelens/backends/stt_cpu.py:45` | `FAKE_IN_PRODUCTION_PATH` | Replaced with real ONNX Whisper model loader & greedy decode loop. Raises `BackendUnavailable` if model files absent. |
-| 3 | Hardcoded string transcript "QNN STT placeholder" | `lecturelens/backends/stt_qnn.py:58` | `FAKE_IN_PRODUCTION_PATH` | Removed placeholder string; updated QNN session checker to set `verified_npu=False` and raise `BackendUnavailable` if QNN provider missing. |
-| 4 | Random hash-based embedding generation | `lecturelens/backends/embed_onnx.py:36` | `FAKE_IN_PRODUCTION_PATH` | Replaced with real ONNX model loader (`all-MiniLM-L6-v2`). Moved hash vectors to `DeterministicEmbedBackend` (test-only). |
-| 5 | Legacy mock benchmark results & charts | `benchmarks/results/latest.csv` | `UNVERIFIED_CLAIM` | Quarantined to `benchmarks/quarantine/`. Added `.gitignore` rule. |
-| 6 | Synthetic audio array in offline guard check | `scripts/offline_check.py:65` | `TEST_ONLY` | Acceptable test fixture for network isolation guard verification. |
-| 7 | Synthetic audio in Streamlit demo toggle | `lecturelens/ui/app.py:123` | `DEMO_MODE` | Acceptable demo feature; clearly labeled in UI sidebar as Demo Mode. |
+| 1 | Canned template JSON + simulated latency | `backends/llm_cpu.py:38-56` | FAKE_IN_PROD | Replaced with real Ollama/llama.cpp HTTP client |
+| 2 | `time.sleep` RTF simulation + fixed transcript string | `backends/stt_cpu.py:45` | FAKE_IN_PROD | Replaced with real ONNX Whisper + PyTorch fallback |
+| 3 | Hardcoded "QNN STT placeholder" transcript | `backends/stt_qnn.py:58` | FAKE_IN_PROD | Removed; raises `BackendUnavailable` if QNN absent |
+| 4 | Random hash-based embedding | `backends/embed_onnx.py:36` | FAKE_IN_PROD | Replaced with real ONNX MiniLM model loader |
+| 5 | Legacy mock benchmark CSV/charts | `benchmarks/results/latest.csv` | UNVERIFIED | Quarantined to `benchmarks/quarantine/` |
+
+## Phase B Findings (Second-Pass Audit, 2026-09-29)
+
+| # | Finding | File & Line | Classification | Fix Applied |
+| :--- | :--- | :--- | :--- | :--- |
+| 6 | `consistency_check.py`: ref == hyp (self-comparison) | `scripts/consistency_check.py:90-91` | WRONG_MEASUREMENT | Rewrote to read `checkpoint_sample_reference.txt` vs `actual_transcript.txt` |
+| 7 | `quality_check.py`: static fallback reported 1.0 | `scripts/quality_check.py:104-106` | WRONG_MEASUREMENT | Documented as unmeasured; grounding methodology explained honestly |
+| 8 | README benchmark table: NPU numbers unlabeled | `README.md:72-78` | UNVERIFIED_CLAIM | Added "design-intent, Snapdragon X" labels; CPU numbers clearly marked |
+| 9 | `DEMO_SCRIPT.md`: "NPU vs CPU benchmark table proves advantage" | `docs/DEMO_SCRIPT.md:18` | MISLEADING | Rewritten — CPU-only demo, NPU path described as code-complete/untested |
+| 10 | `SUBMISSION_FORM_DRAFT.md`: implied NPU results | `docs/SUBMISSION_FORM_DRAFT.md:15` | MISLEADING | Rewritten with full disclosure: Intel AMD64 dev machine, no NPU hardware |
 
 ---
 
-## 🧪 Unit & Integrity Test Results
+## Device & NPU Status (Verified on Submission Machine)
 
 ```
-tests/test_audio.py::test_preprocess_audio PASSED
-tests/test_audio.py::test_vad_detects_speech_bursts PASSED
-tests/test_backend_detect.py::test_detect_hardware_structure PASSED
-tests/test_chunker.py::test_chunker_coverage_and_overlap PASSED
-tests/test_no_simulation_in_prod.py::test_stt_factory_does_not_return_simulated PASSED
-tests/test_no_simulation_in_prod.py::test_llm_factory_does_not_return_simulated PASSED
-tests/test_no_simulation_in_prod.py::test_embed_factory_does_not_return_simulated PASSED
-tests/test_no_simulation_in_prod.py::test_determinist_embed_is_flagged_simulated PASSED
-tests/test_no_simulation_in_prod.py::test_backend_info_fields_exist PASSED
-tests/test_notes_schema.py::test_clean_and_parse_json_valid PASSED
-tests/test_notes_schema.py::test_clean_and_parse_json_repair_trailing_comma PASSED
-tests/test_notes_schema.py::test_quiz_question_validation PASSED
-tests/test_notes_schema.py::test_generate_full_notes_end_to_end PASSED
-tests/test_search.py::test_chunk_transcript_into_passages PASSED
-tests/test_search.py::test_search_index_top_k PASSED
+machine:          Intel AMD64 (8 cores), Windows 11
+QNNExecutionProvider: NOT AVAILABLE
+Foundry Local:    NOT AVAILABLE
+verified_npu:     False (all backends)
 
-============================= 15 passed in 0.22s =============================
+STT backend:      whisper-pytorch-cpu (PyTorch Whisper tiny)
+LLM backend:      cpu-local-llm (Ollama phi3:mini)
+Embed backend:    ONNX CPU (MiniLM-L6-v2)
+```
+
+NPU code paths (`stt_qnn.py`, `llm_foundry.py`) are implemented and code-complete. They have **not been executed on Snapdragon X hardware** due to hardware access constraints.
+
+---
+
+## Unit & Integration Test Results (Final)
+
+```
+tests/test_audio.py ..                              PASSED (2)
+tests/test_backend_detect.py .                      PASSED (1)
+tests/test_chunker.py .                             PASSED (1)
+tests/test_no_simulation_in_prod.py .....           PASSED (5)
+tests/test_notes_schema.py ....                     PASSED (4)
+tests/test_qa.py ...                                PASSED (3)
+tests/test_search.py ..                             PASSED (2)
+tests/test_wer.py ......                            PASSED (6)
+
+========================= 24 passed in 369s ==========================
 ```
 
 ---
 
-## 📋 Status of Backends
+## Real Measurements (CPU, Development Machine)
 
-- **`STTBackend` (`QNNWhisperBackend` & `CPUWhisperBackend`):**
-  - `is_real=True`, `is_simulated=False` when ONNX Whisper model files exist under `models/whisper-base-en/`.
-  - Raises `BackendUnavailable` when model files are missing.
-- **`LLMBackend` (`FoundryLLMBackend` & `CPULLMBackend`):**
-  - `is_real=True`, `is_simulated=False` when connected to live Foundry Local or local Ollama / llama.cpp engine.
-  - Raises `BackendUnavailable` when no server is running.
-- **`EmbedBackend` (`ONNXEmbedBackend`):**
-  - `is_real=True`, `is_simulated=False` when model exists under `models/all-MiniLM-L6-v2/`.
-  - `DeterministicEmbedBackend` is strictly marked `is_simulated=True` and used only in unit tests.
+| Metric | Value | Method |
+| :--- | :--- | :--- |
+| STT WER | **10%** (0.10) | Whisper-tiny vs 40-word human reference |
+| STT char similarity | 0.9894 | SequenceMatcher ratio |
+| LLM throughput | **4.93 tok/sec** | Ollama phi3:mini, measured |
+| LLM TTFT | **15.25 s** | Ollama phi3:mini, measured |
+| STT RTF | **~0.166** | 18.85s audio, measured |
+| Offline check | **0 network calls** | socket guard confirmed |
+| Grounding (Q&A) | **3/3 spot-check** ✅ | n=3 items, not a statistical benchmark |
+
+---
+
+## Backend Status Summary
+
+| Backend | `is_real` | `is_simulated` | `verified_npu` |
+| :--- | :--- | :--- | :--- |
+| `CPUWhisperBackend` (PyTorch) | True | False | False |
+| `CPULLMBackend` (Ollama) | True | False | False |
+| `ONNXEmbedBackend` | True | False | False |
+| `QNNWhisperBackend` | N/A | N/A | N/A (unavailable on dev machine) |
+| `FoundryLLMBackend` | N/A | N/A | N/A (unavailable on dev machine) |

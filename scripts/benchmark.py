@@ -403,6 +403,24 @@ def run_benchmark_harness(dry_run: bool = False, full: bool = False):
     print(f"\nINTEGRITY: {'PASS' if integrity_pass else 'FAIL'}")
     print(f"{'=' * 55}\n")
 
+    # --- Consistency / WER check (always runs as part of benchmark suite) ---
+    try:
+        from scripts.consistency_check import run_consistency_evaluation
+        ref_path = root_dir / "benchmarks" / "inputs" / "checkpoint_sample_reference.txt"
+        hyp_path = root_dir / "actual_transcript.txt"
+        if ref_path.exists() and hyp_path.exists():
+            ref = ref_path.read_text(encoding="utf-8").strip()
+            hyp = hyp_path.read_text(encoding="utf-8").strip()
+            wer_res = run_consistency_evaluation(ref, hyp, label="STT WER (benchmark suite run)")
+            print(f"\n[WER CHECK] {wer_res['label']}")
+            print(f"  WER:              {wer_res['wer']:.4f} ({wer_res['wer']*100:.1f}%)")
+            print(f"  Char Similarity:  {wer_res['char_similarity']}")
+            print(f"  Passed (<35%):    {wer_res['passed']}\n")
+        else:
+            logger.warning("WER check skipped: reference or hypothesis transcript file not found.")
+    except Exception as e:
+        logger.warning(f"WER check error: {e}")
+
     import sys as _sys
     _sys.exit(0 if integrity_pass else 1)
 
