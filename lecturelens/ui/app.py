@@ -38,8 +38,9 @@ st.caption("Fully Offline Lecture Copilot Accelerated for Snapdragon X Series La
 settings = render_sidebar()
 
 # Initialize Session State Variables
-if "current_session" not in st.session_state:
-    st.session_state.current_session = None
+if "current_session" not in st.session_state or st.session_state.current_session is None:
+    available_sessions = list_sessions()
+    st.session_state.current_session = available_sessions[0] if available_sessions else None
 if "recording" not in st.session_state:
     st.session_state.recording = False
 if "recorder" not in st.session_state:
