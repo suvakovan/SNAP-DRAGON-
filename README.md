@@ -1,4 +1,4 @@
-# 🎓 LectureLens: Offline Lecture Copilot for Snapdragon PCs
+.# 🎓 LectureLens: Offline Lecture Copilot for Snapdragon PCs
 
 > **One-Sentence Pitch:** A fully offline, privacy-first lecture copilot engineered for Snapdragon X Windows-on-ARM laptops that transforms microphone streams or recorded lectures into transcripts, executive summaries, interactive quizzes, flashcards, and semantic search on-device.
 
