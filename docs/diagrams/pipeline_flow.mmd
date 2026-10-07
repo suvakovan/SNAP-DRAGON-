@@ -1,0 +1,27 @@
+﻿%%{init: {'theme':'dark'}}%%
+sequenceDiagram
+    participant U as User
+    participant UI as Streamlit UI
+    participant REC as MicRecorder
+    participant PP as Preprocessor
+    participant VAD as VAD Filter
+    participant CHK as Chunker
+    participant STT as STT Backend
+    participant LLM as LLM Backend
+    participant EMB as Embed Backend
+    participant DB as Session Store
+
+    U->>UI: Upload audio / Start recording
+    UI->>REC: Capture audio stream
+    REC->>PP: Raw audio buffer
+    PP->>PP: Mono, resample 16kHz, normalize
+    PP->>VAD: Preprocessed audio
+    VAD->>CHK: Speech regions
+    CHK->>STT: Audio chunks
+    STT->>STT: Transcribe (NPU/CPU)
+    STT->>LLM: Full transcript
+    LLM->>LLM: Generate summary, quiz, flashcards
+    LLM->>EMB: Transcript passages
+    EMB->>EMB: Compute embeddings
+    EMB->>DB: Save session + search index
+    DB->>UI: Display results
