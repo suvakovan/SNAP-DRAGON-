@@ -1,0 +1,16 @@
+﻿%%{init: {'theme':'dark'}}%%
+flowchart TD
+    A["Backend Factory Called"] --> B{"preference = ?"}
+    B -->|"auto/npu"| C["Try NPU Backend"]
+    B -->|"cpu"| F["Try CPU Backend"]
+    C --> D{"QNN Provider Available?"}
+    D -->|Yes| E["Load QNN Session"]
+    D -->|No| F
+    E --> G{"QNN First Provider?"}
+    G -->|Yes| H["verified_npu = True âœ…"]
+    G -->|No| F
+    F --> I{"Model Files Present?"}
+    I -->|Yes| J["Load CPU ONNX Session"]
+    I -->|No| K["Raise BackendUnavailable âŒ"]
+    J --> L["is_real = True, is_simulated = False"]
+    H --> L
