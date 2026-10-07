@@ -1,0 +1,24 @@
+﻿name: Lint
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install linters
+        run: pip install flake8 black isort
+      - name: Check formatting
+        run: black --check lecturelens/ tests/
+      - name: Check imports
+        run: isort --check-only lecturelens/ tests/
+      - name: Lint
+        run: flake8 lecturelens/ tests/ --max-line-length 120 --ignore E501,W503
