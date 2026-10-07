@@ -1,0 +1,10 @@
+﻿include LICENSE
+include README.md
+include CHANGELOG.md
+include CONTRIBUTING.md
+include requirements.txt
+include pyproject.toml
+recursive-include lecturelens *.py
+recursive-include docs *.md
+recursive-include scripts *.py *.ps1
+recursive-include tests *.py
